@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>檔案清單</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <div class="container mt-5">
+      <h1 class="mb-4">檔案目錄</h1>
+      <div class="accordion" id="fileAccordion"></div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+      // 假設已從 API 獲得的 JSON 資料
+      const filesJson = {
+        "/data1/decode/tmpdat/FGGE.HIS": [
+          "1.1M Nov 7 14:40 sa2024110704.dat",
+          "1.1M Nov 7 14:40 sa2024110705.dat",
+          "958K Nov 7 14:40 sa2024110706.dat",
+        ],
+        "/data1/decode/tmpdat/HDMOS.HIS": [
+          "2.0M Nov 7 14:37 Data.ncrnet.radprd.dBZ.grid.HDMOS.2024-11-07_1430.NHDMOS",
+          "2.0M Nov 7 14:31 Data.ncrnet.radprd.dBZ.grid.HDMOS.2024-11-07_1424.NHDMOS",
+        ],
+      };
+
+      const descriptionsJson = {
+        "/data1/decode/tmpdat/FGGE.HIS": {
+          class: ["sa", "sb"],
+          description: "這是 FGGE 資料的歷史紀錄",
+        },
+        "/data1/decode/tmpdat/HDMOS.HIS": {
+          class: [],
+          description: "這是 HDMOS 資料的描述",
+        },
+        "/data1/decode/tmpdat/LITCWB.HIS": {
+          class: [],
+          description: "LITCWB 檔案的歷史紀錄",
+        },
+      };
+
+      // 生成內容的函數
+      function generateAccordion(filesData, descriptionsData) {
+        const $accordion = $("#fileAccordion");
+        let index = 0;
+
+        $.each(filesData, function (directory, files) {
+          index++;
+          const headerId = `heading${index}`;
+          const collapseId = `collapse${index}`;
+          const description =
+            descriptionsData[directory]?.description || "無說明";
+          const classes = descriptionsData[directory]?.class || [];
+
+          const classAccordionId = `classAccordion${index}`;
+          const $accordionItem = $(`
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="${headerId}">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#${collapseId}" aria-expanded="false" aria-controls="${collapseId}">
+                        ${directory} <span class="ms-2 text-muted">(${description})</span>
+                    </button>
+                </h2>
+                <div id="${collapseId}" class="accordion-collapse collapse" aria-labelledby="${headerId}" data-bs-parent="#fileAccordion">
+                    <div class="accordion-body">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>檔案名稱</th>
+                                    <th>更新時間</th>
+                                    <th>大小</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${files
+                                  .map((file) => {
+                                    const [size, month, day, time, name] = file
+                                      .trim()
+                                      .split(/\s+/);
+                                    return `
+                                        <tr>
+                                            <td>${name}</td>
+                                            <td>${month} ${day} ${time}</td>
+                                            <td>${size}</td>
+                                        </tr>
+                                    `;
+                                  })
+                                  .join("")}
+                            </tbody>
+                        </table>
+                        ${
+                          classes.length > 0
+                            ? `
+                        <div class="accordion mt-3" id="${classAccordionId}">
+                            ${classes
+                              .map((cls, clsIndex) => {
+                                const classHeaderId = `classHeading${index}_${clsIndex}`;
+                                const classCollapseId = `classCollapse${index}_${clsIndex}`;
+                                return `
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header" id="${classHeaderId}">
+                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#${classCollapseId}" aria-expanded="false" aria-controls="${classCollapseId}">
+                                            Class: ${cls}
+                                        </button>
+                                    </h2>
+                                    <div id="${classCollapseId}" class="accordion-collapse collapse" aria-labelledby="${classHeaderId}" data-bs-parent="#${classAccordionId}">
+                                        <div class="accordion-body">
+                                            這是 ${cls} 的詳細內容
+                                        </div>
+                                    </div>
+                                </div>
+                              `;
+                              })
+                              .join("")}
+                        </div>
+                        `
+                            : ""
+                        }
+                    </div>
+                </div>
+            </div>
+          `);
+
+          $accordion.append($accordionItem);
+        });
+      }
+
+      // 調用函數以生成頁面內容
+      $(document).ready(function () {
+        generateAccordion(filesJson, descriptionsJson);
+      });
+    </script>
+  </body>
+</html>

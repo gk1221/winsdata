@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>檔案清單</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <div class="container mt-5">
+      <h1 class="mb-4">檔案目錄</h1>
+      <div class="accordion" id="fileAccordion"></div>
+    </div>
+
+    <script src="/static/jquery-3.6.0.min.js"></script>
+    <script src="/static/bootstrap.bundle.min.js"></script>
+    <script src="/static/generateAccordion.js"></script>
+    <script>
+      // 使用 jQuery 的 AJAX 方法來載入 files API 和 config API 資料
+      $.when(
+        $.getJSON("api/wins3"), // 主 JSON 檔案 API
+        $.getJSON("api/config") // 說明 JSON 檔案 API
+      )
+        .done(function (fileData, descriptionData) {
+          const filesJson = fileData[0];
+          const descriptionsJson = descriptionData[0];
+          generateAccordion(filesJson, descriptionsJson);
+        })
+        .fail(function () {
+          console.error("無法載入 API 資料");
+          alert("無法載入資料，請檢查 API 連線。");
+        });
+
+      // 生成內容的函數
+
+      // 調用函數以生成頁面內容
+      $(document).ready(function () {
+        generateAccordion(filesJson, descriptionsJson);
+      });
+    </script>
+  </body>
+</html>

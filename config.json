@@ -1,0 +1,18 @@
+{
+  "/data1/decode/tmpdat/FGGE.HIS": {
+    "class": { "sa": "SBBB", "sb": "SBBB" },
+    "description": "這是 FGGE 資料的歷史紀錄"
+  },
+  "/data1/decode/tmpdat/HDMOS.HIS": {
+    "class": [],
+    "description": "這是 HDMOS 資料的描述"
+  },
+  "/data1/decode/tmpdat/LITCWB.HIS": {
+    "class": [],
+    "description": "LITCWB 檔案的歷史紀錄"
+  },
+  "/data1/decode/tmpdat/MFC/RAWRAOB": {
+    "class": { "46699": "綠島(46699)", "46692": "東沙(46692)" },
+    "description": "觀測資料"
+  }
+}
