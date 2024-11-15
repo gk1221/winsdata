@@ -21,7 +21,6 @@ function generateAccordion(filesData, descriptionsData) {
     } else {
       // 如果 `classes` 存在，生成子項目並根據 `classes` 過濾資料
       let classifiedFiles = {};
-      console.log(classes);
       Object.keys(classes).forEach((cls) => {
         classifiedFiles[cls] = [];
 
@@ -34,8 +33,6 @@ function generateAccordion(filesData, descriptionsData) {
           return name.startsWith(cls); // 檢查檔案名稱是否以 class 開頭
         });
       });
-
-      console.log(classifiedFiles);
 
       // 先生成子項目，再生成主層顯示
       const classAccordionHtml = generateClassAccordion(
@@ -84,7 +81,9 @@ function generateMainAccordion(
                                     const [size, month, day, time, name] = file
                                       .trim()
                                       .split(/\s+/);
-                                    return `
+                                    return !name
+                                      ? ""
+                                      : `
                                         <tr>
                                             <td>${name}</td>
                                             <td>${month} ${day} ${time}</td>
@@ -108,26 +107,23 @@ function generateClassAccordion(directory, files, classes, description, index) {
   const headerId = `heading${index}`;
   const collapseId = `collapse${index}`;
   return `
-
           <div class="accordion-item">
             <h2 class="accordion-header" id="${headerId}">
                 <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#${collapseId}" aria-expanded="false" aria-controls="${collapseId}">
                     ${directory} <span class="ms-2 text-muted">${description}</span>
                 </button>
             </h2>
-
-
             <div id="${collapseId}" class="accordion-collapse collapse" aria-labelledby="${headerId}" data-bs-parent="#fileAccordion">
                 ${Object.entries(classes)
-                  .map(([key, value]) => {
-                    const classHeaderId = `classHeading${index}_${index}`;
-                    const classCollapseId = `classCollapse${index}_${index}`;
+                  .map(([key, value], ix) => {
+                    const classHeaderId = `classHeading${index}_${ix}`;
+                    const classCollapseId = `classCollapse${index}_${ix}`;
 
                     return `
                     <div class="accordion-item">
                         <h2 class="accordion-header mx-2" id="${classHeaderId}">
                             <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#${classCollapseId}" aria-expanded="false" aria-controls="${classCollapseId}">
-                            ${key} ${value}
+                            ${key} <span class="ms-2 text-muted">${value}</span>
                             </button>
                         </h2>
                         <div id="${classCollapseId}" class="accordion-collapse collapse" aria-labelledby="${classHeaderId}" data-bs-parent="#${classAccordionId}">
@@ -152,7 +148,10 @@ function generateClassAccordion(directory, files, classes, description, index) {
                                                   time,
                                                   name,
                                                 ] = file.trim().split(/\s+/);
-                                                return `
+                                                console.log(name);
+                                                return !name
+                                                  ? ""
+                                                  : `
                                                     <tr>
                                                         <td>${name}</td>
                                                         <td>${month} ${day} ${time}</td>
@@ -174,4 +173,28 @@ function generateClassAccordion(directory, files, classes, description, index) {
             </div>
           </div>
       `;
+}
+
+function callrefresh() {
+  // 顯示遮罩層
+  $("#loadingOverlay").show();
+
+  // 發送 API 請求
+  $.when(
+    $.getJSON("/run-ls")
+      .done((answer) => {
+        if (answer.status === "success") {
+          alert("完工了"); // 提示完成
+          location.reload(); // 重新整理頁面
+        } else {
+          alert("操作失敗，請再試一次！");
+        }
+      })
+      .fail(() => {
+        alert("API 請求失敗，請檢查網路或伺服器狀態。");
+      })
+  ).always(() => {
+    // 隱藏遮罩層
+    $("#loadingOverlay").hide();
+  });
 }
