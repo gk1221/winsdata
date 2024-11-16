@@ -11,7 +11,7 @@ COPY . .
 RUN pip install --no-cache-dir Flask
 
 # 對外暴露 80 埠
-EXPOSE 80
+EXPOSE 8080
 
 # 運行 Flask 應用
 CMD ["python", "app.py"]

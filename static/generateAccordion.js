@@ -116,7 +116,7 @@ function generateClassAccordion(directory, files, classes, description, index) {
             <div id="${collapseId}" class="accordion-collapse collapse" aria-labelledby="${headerId}" data-bs-parent="#fileAccordion">
                 ${Object.entries(classes)
                   .map(([key, value], ix) => {
-                    const classHeaderId = `classHeading${index}_${ix}`;
+                    const classHeaderId = `classHeading${index}`;
                     const classCollapseId = `classCollapse${index}_${ix}`;
 
                     return `
@@ -126,7 +126,7 @@ function generateClassAccordion(directory, files, classes, description, index) {
                             ${key} <span class="ms-2 text-muted">${value}</span>
                             </button>
                         </h2>
-                        <div id="${classCollapseId}" class="accordion-collapse collapse" aria-labelledby="${classHeaderId}" data-bs-parent="#${classAccordionId}">
+                        <div id="${classCollapseId}" class="accordion-collapse collapse" aria-labelledby="${classHeaderId}" data-bs-parent="#${collapseId}">
                             <div class="accordion-body">
                                 ${
                                   files.length > 0
